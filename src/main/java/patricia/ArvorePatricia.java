@@ -1,300 +1,159 @@
 package patricia;
 
-import java.io.*;
+public class ArvorePatricia {
 
-import java.util.Scanner;
+    private static abstract class PatNo {
+    }
 
-class PatriciaTrieNode {
-    // Member variables of this class
-    // Declaring elements, number and data.
-    int number;
-    int data;
- 
-    // Two nodes are considered into action
-    // node1 -> left child and
-    // node2 -> right child
-    PatriciaTrieNode leftChild, rightChild;
-}
- 
-class  ArvorePatricia {
- 
-    // Member variable of this class
-    // Declaring two elements
-    // Maxbits can help us to store elements in the Trie
-    // The root helps us to fix a global value.
-    private PatriciaTrieNode root;
-    private static final int MaxBits = 128;
- 
-    // Method 1
-    // PatriciaTrie where initially
-    // the root equals NULL
-    public  ArvorePatricia() { root = null; }
- 
-    // Method 2 - isEmpty()
-    // Method used to check if the function is empty as
-    // it returns true or false basing on the condition
-    public boolean isEmpty() { return root == null; }
- 
-    // Method 3 - makeEmpty()
-    // Method  used to help in emptying the root
-    // of the Patricia Node
-    public void makeEmpty() { root = null; }
- 
-    // Method 4 - bit()
-    // Declaring the function bit which performs a search
-    // operation in finding the bit which should be matched
-    // as input
-    private boolean bit(int k, int i)
-    {
-        // Step 1 : Binary input is first converted to
-        // string as in strings its easy to match its
-        // corporate values
-        String binary = Integer.toString(k, 2);
- 
-        // Step2: Condition check while input length
-        // is not equal to the length of the maxbits
-        while (binary.length() != MaxBits)
- 
-            // Step 3: Keep adding the binary value
-            // until it gets the last number
-            binary = "0" + binary;
- 
-        // Step 4: If the binary matches the desired value
-        //  needed, true will be returned
-        if (binary.charAt(i - 1) == '1')
-            return true;
- 
-        // else we return false
-        return false;
+    private static class PatNoInt extends PatNo {
+
+        int index;
+        PatNo esq, dir;
     }
- 
-    // Method 5 - search()
-    public boolean search(int k)
-    {
-        // Taking int num , as the half value of
-        // the of entered elements
-        int num = (int)(Math.log(k) / Math.log(2));
- 
-        // Condition check whether number
-        // is greater than maxBits
-        if (num > MaxBits) {
-            // Display message
-            // Print number has exceeded the limit
-            System.out.println("Exceeded the limit");
- 
-            // And return false
-            return false;
+
+    private static class PatNoExt extends PatNo {
+
+        String chave; // @{\it O tipo da chave depende da aplica\c{c}\~ao}@
+    }
+
+    private PatNo raiz;
+    private int nbitsChave;
+
+    // @{\it Retorna o i-\'esimo bit da chave k a partir da esquerda}@
+    private int bit(int i, String k) {
+        if (i == 0) {
+            return 0;
         }
- 
-        // Now when an element is created for the class
-        // named as 'searchNode'
- 
-        // This searches Node will go to the next
-        // search function
-        PatriciaTrieNode searchNode = search(root, k);
- 
-        // Now we will search the data element whether
-        // k is present in our node or not.
- 
-        // If it is present print true
-        // else print false
-        if (searchNode.data == k)
-            return true;
-        else
-            return false;
+        char c = k.charAt(i);
+        int myInt = Character.getNumericValue(c);
+        //System.out.println(myInt);
+        return myInt;
     }
- 
-    // By now, search operation of
-    // PatriciaTrieNode class is declared
-    private PatriciaTrieNode search(PatriciaTrieNode t,
-                                    int k)
-    {
- 
-        // Now these are the currentNode and nextNode
-        PatriciaTrieNode currentNode, nextNode;
- 
-        // Step 1 : Now if the elements present in the t
-        // mode
-        //  are NULL,then NULL will be returned
+
+    // @{\it Verifica se p \'e n\'o externo}@
+    private boolean eExterno(PatNo p) {
+        Class classe = p.getClass();
+        return classe.getName().equals(PatNoExt.class.getName());
+    }
+
+    private PatNo criaNoInt(int i, PatNo esq, PatNo dir) {
+        PatNoInt p = new PatNoInt();
+        p.index = i;
+        p.esq = esq;
+        p.dir = dir;
+        return p;
+    }
+
+    private PatNo criaNoExt(String k) {
+        PatNoExt p = new PatNoExt();
+        p.chave = k;
+        return p;
+    }
+
+    private void pesquisa(String k, PatNo t) {
+        if (this.eExterno(t)) {
+            PatNoExt aux = (PatNoExt) t;
+            if (aux.chave.equals(k)) {
+                System.out.println("Elemento encontrado");
+            } else {
+                System.out.println("Elemento nao encontrado");
+            }
+        } else {
+            PatNoInt aux = (PatNoInt) t;
+            if (this.bit(aux.index, k) == 0) {
+                pesquisa(k, aux.esq);
+            } else {
+                pesquisa(k, aux.dir);
+            }
+        }
+    }
+
+    private PatNo insereEntre(String k, PatNo t, int i) {
+        PatNoInt aux = null;
+        if (!this.eExterno(t)) {
+            aux = (PatNoInt) t;
+        }
+        if (this.eExterno(t) || (i < aux.index)) { // @{\it Cria um novo n\'o externo}@
+            PatNo p = this.criaNoExt(k);
+            if (this.bit(i, k) == 1) {
+                return this.criaNoInt(i, t, p);
+            } else {
+                return this.criaNoInt(i, p, t);
+            }
+        } else {
+            if (this.bit(aux.index, k) == 1) {
+                aux.dir = this.insereEntre(k, aux.dir, i);
+            } else {
+                aux.esq = this.insereEntre(k, aux.esq, i);
+            }
+            return aux;
+        }
+    }
+
+    private PatNo insere(String k, PatNo t) {
         if (t == null) {
-            return null;
+            return this.criaNoExt(k);
+        } else {
+            PatNo p = t;
+            while (!this.eExterno(p)) {
+                PatNoInt aux = (PatNoInt) p;
+                if (this.bit(aux.index, k) == 1) {
+                    p = aux.dir;
+                } else {
+                    p = aux.esq;
+                }
+            }
+            PatNoExt aux = (PatNoExt) p;
+            int i = 1; // @{\it acha o primeiro bit diferente}@
+            while ((i <= this.nbitsChave)
+                    && (this.bit(i, k) == this.bit(i, aux.chave))) {
+                i++;
+            }
+            if (i > this.nbitsChave) {
+                System.out.println("Erro: chave ja esta na arvore");
+                return t;
+            } else {
+                return this.insereEntre(k, t, i);
+            }
         }
- 
-        // Step 2: Now, considering the next node value to
-        // be the left child of the present variable t
-        nextNode = t.leftChild;
- 
-        // Step 3:  Next we keep the current node value
-        // to be "t"
-        currentNode = t;
- 
-        // Condition check
-        // Step 4: If the next node bitnumber is greater
-        // than the current numbers bitcode
-        while (nextNode.number > currentNode.number) {
-            // Step 5: Making the current Node as the next
-            // node
- 
-            // It is more like checking each
-            // as the next node becomes the current node
-            // Each time desired output won't be obtained
-            currentNode = nextNode;
- 
-            // Step 6: Putting this nextNode in the bitwise
-            // operator This method helps us to find whether
-            // it is LeftChild or Right Child
-            nextNode = (bit(k, nextNode.number))
-                           ? nextNode.rightChild
-                           : nextNode.leftChild;
-        }
-        // Step 7: Now we return the next Node..
-        return nextNode;
     }
- 
-    // Method 6 - insert()
-    // Inserting the value element inside PatriciaTrieNode
-    public void insert(int element)
-    {
-        // Num is the variable where the value entered by
-        // the user will be stored. This value will be
-        // helpful to calculate the search index as well
-        int num
-            = (int)(Math.log(element) / Math.log(2)) + 1;
- 
-        // Now taking num greater than maxBits, it can be
-        // said
-        //  that the PatriciaTrieNode is full
-        if (num > MaxBits) {
-            // This will print the statement that we are
-            // full
- 
-            // Display message
-            System.out.println(
-                "We are full, The number is too large");
- 
-            return;
+
+    private void central(PatNo pai, PatNo filho, String msg) {
+        if (filho != null) {
+            if (!this.eExterno(filho)) {
+                PatNoInt aux = (PatNoInt) filho;
+                central(filho, aux.esq, "ESQ");
+                if (pai != null) {
+                    System.out.println("Pai: " + ((PatNoInt) pai).index + " " + msg + " Int: " + aux.index);
+                } else {
+                    System.out.println("Pai: " + pai + " " + msg + " Int: " + aux.index);
+                }
+                central(filho, aux.dir, "DIR");
+            } else {
+                PatNoExt aux = (PatNoExt) filho;
+                if (pai != null) {
+                    System.out.println("Pai: " + ((PatNoInt) pai).index + " " + msg + " Ext: " + aux.chave);
+                } else {
+                    System.out.println("Pai: " + pai + " " + msg + " Ext: " + aux.chave);
+                }
+            }
         }
- 
-        // Now the root value becomes the value
-        // where the element gets inserted
-        root = insert(root, element);
     }
- 
-    // Now defining a function insert of the class
-    // PatriciaTrieNode
-    private PatriciaTrieNode insert(PatriciaTrieNode t,
-                                    int element)
-    {
- 
-        // Here the praticiaNode will have current , parent
-        // It will also have lastNode and newNode
-        PatriciaTrieNode current = null, parent, lastNode,
-                         newNode;
-        int i;
- 
-        // Here t equals null
- 
-        // Condition check
-        // If it equals null simply declare
-        // the following attributes
-        if (t == null) {
-            t = new PatriciaTrieNode();
- 
-            // Number is initialized to be 0
-            t.number = 0;
- 
-            // Data of the t node should be
-            // the element number
-            t.data = element;
- 
-            // where as the child will be t and
-            t.leftChild = t;
- 
-            // Right child of the t will be made empty
-            // or be equal to null
-            t.rightChild = null;
- 
-            // Return the data t
-            return t;
-        }
- 
-        // Now declaring the lastNode to be search
-        lastNode = search(t, element);
- 
-        // If we declare the last node to be
-        // a part of the search function.
- 
-        // Now  we can compare it with the data
-        // already present in the PatriciaTrieNode
-        // If we have the key already Present
-        if (element == lastNode.data) {
-            // Print the display message
-            System.out.println("Key already Present");
- 
-            // Return t
-            return t;
-        }
- 
-        // Iterating variable  from
-        // first element to last element
-        for (i = 1;
-             bit(element, i) == bit(lastNode.data, i); i++)
- 
-            // Keep current to the left Child
-            current = t.leftChild;
- 
-        // Parent is equal to t
-        parent = t;
- 
-        // Condition check
-        // Current number is greater than parent number
-        // And if current number is less than i
-        while (current.number > parent.number
-               && current.number < i) {
-            // If parent is current
-            parent = current;
- 
-            // Now we will see whether the new node
-            // is more flexible to the rightChild
-            // or is it ore available to the left child
-            // using scope resolution operator
-            current = (bit(element, current.number))
-                          ? current.rightChild
-                          : current.leftChild;
-        }
- 
-        // Now we are taking this as newnode
-        newNode = new PatriciaTrieNode();
- 
-        // If we take newnode of number as i
-        newNode.number = i;
- 
-        // Now taking data as element
-        newNode.data = element;
- 
-        // Now taking the leftchild as depending on the
-        // condition
-        // we fix it either to be current or newNode
-        newNode.leftChild
-            = bit(element, i) ? current : newNode;
- 
-        // Now again taking the condition we fix
-        // The right child either to be newNode or
-        // curentNode
-        newNode.rightChild
-            = bit(element, i) ? newNode : current;
- 
-        // If we take current and parent as left child are
-        // same We fix them to be newNode
-        if (current == parent.leftChild) {
-            parent.leftChild = newNode;
-        }
-        else {
-            // else we take the right child to be the
-            // newNode
-            parent.rightChild = newNode;
-        }
-        // we return the value to t
-        return t;
+
+    public void imprime() {
+        this.central(null, this.raiz, "RAIZ");
+    }
+
+    public ArvorePatricia(int nbitsChave) {
+        this.raiz = null;
+        this.nbitsChave = nbitsChave;
+    }
+
+    public void pesquisa(String k) {
+        this.pesquisa(k, this.raiz);
+    }
+
+    public void insere(String k) {
+        this.raiz = this.insere(k, this.raiz);
     }
 }

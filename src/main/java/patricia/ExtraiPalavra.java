@@ -6,7 +6,19 @@ public class ExtraiPalavra {
   private BufferedReader arqDelim, arqTxt;
   private StringTokenizer palavras;
   private String delimitadores;
+  private int linha=1;
+  private int coluna=1;
 
+    public int getLinha() {
+        return linha;
+    }
+
+    public int getColuna() {
+        return coluna;
+    }
+
+  
+  
   public ExtraiPalavra (String nomeArqDelim, String nomeArqTxt) 
   throws Exception {
     this.arqDelim = new BufferedReader (new FileReader (nomeArqDelim));
@@ -17,11 +29,14 @@ public class ExtraiPalavra {
   }  
   public String proximaPalavra () throws Exception{
     if (palavras == null || !palavras.hasMoreTokens()) {
+        coluna=1;
+        linha++;
       String linha = arqTxt.readLine();
       if (linha == null) return null; 
       this.palavras = new StringTokenizer (linha, this.delimitadores);
       if (!palavras.hasMoreTokens()) return ""; // @{\it ignora delimitadores}@
     }
+    coluna++;
     return this.palavras.nextToken ();
   }  
   public void fecharArquivos () throws Exception {
