@@ -1,5 +1,7 @@
 package patricia;
 
+import java.util.ArrayList;
+
 public class ArvorePatricia {
 
     private static abstract class PatNo {
@@ -14,6 +16,8 @@ public class ArvorePatricia {
     private static class PatNoExt extends PatNo {
 
         String chave; // @{\it O tipo da chave depende da aplica\c{c}\~ao}@
+        ArrayList<Integer> linha = new ArrayList<>();
+        ArrayList<Integer> coluna = new ArrayList<>();
     }
 
     private PatNo raiz;
@@ -21,6 +25,7 @@ public class ArvorePatricia {
 
     // @{\it Retorna o i-\'esimo bit da chave k a partir da esquerda}@
     private int bit(int i, String k) {
+        i--;
         if (i == 0) {
             return 0;
         }
@@ -55,6 +60,9 @@ public class ArvorePatricia {
             PatNoExt aux = (PatNoExt) t;
             if (aux.chave.equals(k)) {
                 System.out.println("Elemento encontrado");
+                for (int i = 0; i < aux.linha.size(); i++) {
+                    System.out.println("Linha: " + aux.linha.get(i) + " Coluna: " + aux.coluna.get(i));
+                }
             } else {
                 System.out.println("Elemento nao encontrado");
             }
@@ -90,7 +98,7 @@ public class ArvorePatricia {
         }
     }
 
-    private PatNo insere(String k, PatNo t) {
+    private PatNo insere(String k, PatNo t, int linhas, int colunas) {
         if (t == null) {
             return this.criaNoExt(k);
         } else {
@@ -110,9 +118,12 @@ public class ArvorePatricia {
                 i++;
             }
             if (i > this.nbitsChave) {
-                System.out.println("Erro: chave ja esta na arvore");
+                aux.linha.add(linhas);
+                aux.coluna.add(colunas);
                 return t;
             } else {
+                aux.linha.add(linhas);
+                aux.coluna.add(colunas);
                 return this.insereEntre(k, t, i);
             }
         }
@@ -153,7 +164,7 @@ public class ArvorePatricia {
         this.pesquisa(k, this.raiz);
     }
 
-    public void insere(String k) {
-        this.raiz = this.insere(k, this.raiz);
+    public void insere(String k, int linhas, int colunas) {
+        this.raiz = this.insere(k, this.raiz, linhas, colunas);
     }
 }

@@ -24,7 +24,7 @@ public class ExtraiPalavra {
     this.arqDelim = new BufferedReader (new FileReader (nomeArqDelim));
     this.arqTxt = new BufferedReader (new FileReader (nomeArqTxt));
     // @{\it Os delimitadores devem estar juntos em uma \'unica linha do arquivo}@ 
-    this.delimitadores = arqDelim.readLine() + "\r\n"; 
+    //this.delimitadores = arqDelim.readLine() + "\r\n"; 
     this.palavras = null;
   }  
   public String proximaPalavra () throws Exception{
@@ -33,7 +33,7 @@ public class ExtraiPalavra {
         linha++;
       String linha = arqTxt.readLine();
       if (linha == null) return null; 
-      this.palavras = new StringTokenizer (linha, this.delimitadores);
+      this.palavras = new StringTokenizer (linha, " /()-,.?1234567890");
       if (!palavras.hasMoreTokens()) return ""; // @{\it ignora delimitadores}@
     }
     coluna++;
