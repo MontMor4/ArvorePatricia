@@ -1,5 +1,4 @@
-package patricia;
-
+//package ArvorePatricia;
 import java.util.ArrayList;
 
 public class ArvorePatricia {
@@ -49,9 +48,11 @@ public class ArvorePatricia {
         return p;
     }
 
-    private PatNo criaNoExt(String k) {
+    private PatNo criaNoExt(String k,int linhas, int colunas) {
         PatNoExt p = new PatNoExt();
         p.chave = k;
+		p.linha.add(linhas);
+		p.coluna.add(colunas);
         return p;
     }
 
@@ -76,13 +77,13 @@ public class ArvorePatricia {
         }
     }
 
-    private PatNo insereEntre(String k, PatNo t, int i) {
+    private PatNo insereEntre(String k, PatNo t, int i, int linhas, int colunas) {
         PatNoInt aux = null;
         if (!this.eExterno(t)) {
             aux = (PatNoInt) t;
         }
         if (this.eExterno(t) || (i < aux.index)) { // @{\it Cria um novo n\'o externo}@
-            PatNo p = this.criaNoExt(k);
+            PatNo p = this.criaNoExt(k,linhas, colunas);
             if (this.bit(i, k) == 1) {
                 return this.criaNoInt(i, t, p);
             } else {
@@ -90,9 +91,9 @@ public class ArvorePatricia {
             }
         } else {
             if (this.bit(aux.index, k) == 1) {
-                aux.dir = this.insereEntre(k, aux.dir, i);
+                aux.dir = this.insereEntre(k, aux.dir, i, linhas, colunas);
             } else {
-                aux.esq = this.insereEntre(k, aux.esq, i);
+                aux.esq = this.insereEntre(k, aux.esq, i,linhas, colunas);
             }
             return aux;
         }
@@ -100,7 +101,7 @@ public class ArvorePatricia {
 
     private PatNo insere(String k, PatNo t, int linhas, int colunas) {
         if (t == null) {
-            return this.criaNoExt(k);
+            return this.criaNoExt(k, linhas, colunas);
         } else {
             PatNo p = t;
             while (!this.eExterno(p)) {
@@ -122,9 +123,7 @@ public class ArvorePatricia {
                 aux.coluna.add(colunas);
                 return t;
             } else {
-                aux.linha.add(linhas);
-                aux.coluna.add(colunas);
-                return this.insereEntre(k, t, i);
+                return this.insereEntre(k, t, i, linhas, colunas);
             }
         }
     }
