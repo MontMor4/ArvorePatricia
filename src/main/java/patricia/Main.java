@@ -1,4 +1,3 @@
-package patricia;
 
 import java.util.Scanner;
 import java.nio.file.*;
@@ -11,21 +10,10 @@ public class Main {
         // char vetor[] = new char[128];
         System.out.println("Digite o arquivo:");
         String arquivo;
-        long contador = 0;
         arquivo = in.next();
 
         try {
-
-            Path file = Paths.get(arquivo);
-            contador = Files.lines(file).count();
-            System.out.println("Total lines: " + contador);
-
-        } catch (Exception e) {
-            e.getStackTrace();
-        }
-
-        try {
-            ExtraiPalavra palavras = new ExtraiPalavra("delimitador.txt", arquivo);
+            ExtraiPalavra palavras = new ExtraiPalavra(arquivo);
             String palavra = null;
             int i = 1;
 
@@ -34,12 +22,14 @@ public class Main {
                 if (!palavra.equals("")) {
                     String resposta = "";
                     if (palavra.length() < 16) {
-                        for (int k = palavra.length(); k < 16; k++) {   //incrementa o tamanho da palavra com espaços vazios para completar 16 caracteres
+                        for (int k = palavra.length(); k < 16; k++) { // incrementa o tamanho da palavra com espaços
+                                                                      // vazios para completar 16 caracteres
                             palavra += "0";
                         }
                         for (int k = 0; k < 16; k++) {
 
-                            //instancia um "binary" que recebe a conversão do caracter 'k' em um número binário
+                            // instancia um "binary" que recebe a conversão do caracter 'k' em um número
+                            // binário
                             String binary = Integer.toBinaryString((int) palavra.charAt(k));
 
                             if (binary.length() < 8) {
@@ -52,7 +42,7 @@ public class Main {
                     }
                     int linhas = palavras.getLinha();
                     int colunas = palavras.getColuna();
-                    arvore.insere(resposta,linhas,colunas);
+                    arvore.insere(resposta, linhas, colunas);
                 }
             }
             palavras.fecharArquivos();
@@ -60,27 +50,36 @@ public class Main {
             System.out.println(e.getMessage());
         }
 
-        String pesquisa = "educacao";
-        String resposta = "";
-        if (pesquisa.length() < 16) {
-            for (int k = pesquisa.length(); k < 16; k++) {   //incrementa o tamanho da palavra com espaços vazios para completar 16 caracteres
-                pesquisa += "0";
-            }
-            for (int k = 0; k < 16; k++) {
-
-                //instancia um "binary" que recebe a conversão do caracter 'k' em um número binário
-                String binary = Integer.toBinaryString((int) pesquisa.charAt(k));
-
-                if (binary.length() < 8) {
-                    for (int j = 0; j < (8 - binary.length()); j++) {
-                        resposta += "0";
-                    }
+        String pesquisa = "S";
+        System.out.println("Digite a palvra que gostaria de buscar: (Caso não deseje mais procurar palavra digite N)");
+        pesquisa = in.next();
+        while (!pesquisa.equals("N")) {
+            String resposta = "";
+            if (pesquisa.length() < 16) {
+                for (int k = pesquisa.length(); k < 16; k++) { // incrementa o tamanho da palavra com espaços vazios
+                                                               // para completar 16 caracteres
+                    pesquisa += "0";
                 }
-                resposta += binary;
+                for (int k = 0; k < 16; k++) {
+
+                    // instancia um "binary" que recebe a conversão do caracter 'k' em um número
+                    // binário
+                    String binary = Integer.toBinaryString((int) pesquisa.charAt(k));
+
+                    if (binary.length() < 8) {
+                        for (int j = 0; j < (8 - binary.length()); j++) {
+                            resposta += "0";
+                        }
+                    }
+                    resposta += binary;
+                }
+                // arvore.imprime();
+                // System.out.println("Resposta: " + resposta);
+                arvore.pesquisa(resposta);
             }
-            //arvore.imprime();
-            //System.out.println("Resposta: " + resposta);
-            arvore.pesquisa(resposta);
+            System.out.println("Caso queira interromper digite N");
+            System.out.println("Digite a palvra que gostaria de buscar: ");
+            pesquisa = in.next();
         }
     }
 }
