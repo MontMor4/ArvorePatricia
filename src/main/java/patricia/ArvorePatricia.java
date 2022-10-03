@@ -1,4 +1,6 @@
+package patricia;
 //package ArvorePatricia;
+
 import java.util.ArrayList;
 
 public class ArvorePatricia {
@@ -48,11 +50,11 @@ public class ArvorePatricia {
         return p;
     }
 
-    private PatNo criaNoExt(String k,int linhas, int colunas) {
+    private PatNo criaNoExt(String k, int linhas, int colunas) {
         PatNoExt p = new PatNoExt();
         p.chave = k;
-		p.linha.add(linhas);
-		p.coluna.add(colunas);
+        p.linha.add(linhas);
+        p.coluna.add(colunas);
         return p;
     }
 
@@ -83,7 +85,7 @@ public class ArvorePatricia {
             aux = (PatNoInt) t;
         }
         if (this.eExterno(t) || (i < aux.index)) { // @{\it Cria um novo n\'o externo}@
-            PatNo p = this.criaNoExt(k,linhas, colunas);
+            PatNo p = this.criaNoExt(k, linhas, colunas);
             if (this.bit(i, k) == 1) {
                 return this.criaNoInt(i, t, p);
             } else {
@@ -93,7 +95,7 @@ public class ArvorePatricia {
             if (this.bit(aux.index, k) == 1) {
                 aux.dir = this.insereEntre(k, aux.dir, i, linhas, colunas);
             } else {
-                aux.esq = this.insereEntre(k, aux.esq, i,linhas, colunas);
+                aux.esq = this.insereEntre(k, aux.esq, i, linhas, colunas);
             }
             return aux;
         }
